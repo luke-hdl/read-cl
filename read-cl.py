@@ -25,6 +25,8 @@ def main(stdscr):
         words = line.split(" ")
         for i in range(0, len(words)):
             v = words[i]
+            if len(v) > cols:
+                v = v[:cols-4] + "..."
             stdscr.clear()
             stdscr.addstr(int(rows/2), int(cols/2-len(v)/2), v)
             stdscr.refresh()
