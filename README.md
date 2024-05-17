@@ -2,6 +2,13 @@
 
 A very simple implementation of single-word speedreading. I wasn't happy with existing Android options, and developing a command-line solution for use with UserLAnd was a practical, quick way for my simple use case. Ad-free and privacy-preserving - like you'd expect from a basic text file reader!
 
+Limited, experimental epub support included.
+
+## Dependencies
+```
+pip install textract
+```
+
 ## Usage
 
 ```
@@ -14,4 +21,3 @@ For example:
 ```
 python3 read-cl.py samples/lorem.txt 250
 ```
-
