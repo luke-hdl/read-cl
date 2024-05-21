@@ -46,12 +46,12 @@ def iterate_over_words(rows, cols, stdscr):
                         entry = stdscr.getch()
                         while entry == -1:
                             entry = stdscr.getch()
-                        entry = str(entry)
+                        entry = "" + chr(entry)
                         if entry.isnumeric():
                             mark += entry
                         if entry == "d":
-                            if mark - 1 < len(bookmarks):
-                                pointer = bookmarks[m-1]
+                            if int(mark) - 1 < len(bookmarks):
+                                pointer = bookmarks[int(mark)-1]
                                 break
                             else:
                                 mark = ""
