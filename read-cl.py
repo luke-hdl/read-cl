@@ -116,7 +116,7 @@ def draw_word_bar(rows, col_start, col_end, stdscr):
         min_ptr = 0
     max_ptr = pointer + center_row
     if max_ptr >= len(words):
-        max_ptr = len(words)
+        max_ptr = len(words) - 1
     num_cols = col_end - col_start + 1
     stdscr.addstr(center_row, col_start, crop("> " + clean_word(words[pointer]), num_cols))
     current_row = center_row - 1
