@@ -4,10 +4,12 @@ import os
 import textract
 import sys
 import hashlib
+import re
 
 bookmarks = []
 words = []
 pointer = 0
+save_file_name = ""
 
 args_count = len(sys.argv)
 if args_count != 3: #Including the program name.
@@ -19,31 +21,65 @@ if not os.path.exists(".saves/"):
     
 sleep_time = 60/int(sys.argv[2])
 
-#To-do: there's better ways to do this, but they would require some refactoring.
-contents = ""
-if sys.argv[1].endswith(".epub"):
-    contents = textract.process(sys.argv[1], encoding='utf-8').decode()
+def load_words():
+    global bookmarks
+    global words
+    global save_file_name
+    contents = ""
+    if sys.argv[1].endswith(".epub"):
+        contents = textract.process(sys.argv[1], encoding='utf-8').decode()
 
-else:
-    file_to_read = open(sys.argv[1], "r")
-    contents = file_to_read.read()
-    file_to_read.close()
+    else:
+        file_to_read = open(sys.argv[1], "r")
+        contents = file_to_read.read()
+        file_to_read.close()
 
-save_file_name = ".saves/" + hashlib.md5(contents.encode()).hexdigest() + "_save.txt"
-words = contents.split(" ")
+    save_file_name = ".saves/" + hashlib.md5(contents.encode()).hexdigest() + "_save.txt"
+    contents = re.sub("[\s\n]", " ", contents)
+    contents = re.sub("[ ]{1,100}", " ", contents)
+    raw_words = contents.split(" ")
+    
+    for word in raw_words:
+        if word != "":
+            words.append(word)
+                
+    if os.path.exists(save_file_name):
+        save = open(save_file_name, "r")
+        for mark in save.read().split("\n"):
+            if len(mark) > 0:
+                raw = mark.split("\t")
+                if len(raw) == 2:
+                    bookmarks.append([raw[0], int(raw[1])])
+        save.close()
 
-if os.path.exists(save_file_name):
-    save = open(save_file_name, "r")
-    for mark in save.read().split(" "):
-        if len(mark) > 0:
-            bookmarks.append(int(mark))
-    save.close()
-
+def auto_bookmark(regexes):
+    global bookmarks
+    i = 0
+    marks = []
+    if len(regexes) == 0:
+        return
+    while i < len(words) - len(regexes):
+        name = ""
+        i2 = i
+        match = True
+        for regex in regexes:
+            if re.search(regex, words[i2]) == None:
+                match = False
+                break
+            name += words[i2]
+            i2 += 1
+        if match == True:
+            marks.append([name, i])
+            i += len(regexes)
+        else:
+            i += 1
+    bookmarks += marks
+        
 def iterate_over_words(rows, cols, stdscr):
     global words
     global pointer
     global bookmarks
-    while pointer < len(words):
+    while True:
         draw_next_word(rows, cols, stdscr)
         c = stdscr.getch()
         if c == ord('p'):
@@ -52,11 +88,13 @@ def iterate_over_words(rows, cols, stdscr):
                 stdscr.addstr(2, 2, "Reading paused.")
                 stdscr.addstr(3, 3, "q: unpause")
                 stdscr.addstr(4, 3, "b: set bookmark")
-                stdscr.addstr(5, 3, "e: exit")
+                stdscr.addstr(5, 3, "f: fast forward")
+                stdscr.addstr(6, 3, "r: rewind")
+                stdscr.addstr(7, 3, "e: exit")
 
                 if len(bookmarks) > 0:
-                    stdscr.addstr(6, 3, "s: save bookmarks file")
-                    stdscr.addstr(7, 3, "j: jump to bookmark")
+                    stdscr.addstr(8, 3, "s: save bookmarks file")
+                    stdscr.addstr(9, 3, "j: jump to bookmark")
                 draw_word_bar(rows, 30, cols - 1, stdscr)
             
                 char = stdscr.getch()
@@ -69,16 +107,51 @@ def iterate_over_words(rows, cols, stdscr):
                         continue
                     fl = open(save_file_name, "w")
                     for bookmark in bookmarks:
-                        fl.write(str(bookmark) + " ")
+                        fl.write(bookmark[0] + "\t" + str(bookmark[1]) + "\n")
                     fl.close()
+                if char == ord('f') or char == ord('r'):
+                    direction = -1
+                    if char == ord('f'):
+                        direction = 1
+                    speed = 5
+                    while True:
+                        pointer += direction
+                        if pointer >= len(words):
+                            pointer = len(words) - 1
+                        if pointer < 0:
+                            pointer = 0
+                        sleep(60/10000*speed)
+                        stdscr.erase()
+                        draw_word_bar(rows, 30, cols - 1, stdscr)
+                        stdscr.addstr(2, 2, "p: pause")
+                        stdscr.addstr(3, 2, "c: cancel/exit")
+                        stdscr.addstr(4, 2, "r: go backwards")
+                        stdscr.addstr(5, 2, "f: go forwards")
+                        stdscr.addstr(6, 2, "d: slower")
+                        stdscr.addstr(7, 2, "g: faster")
+                        stdscr.addstr(8, 2, "Your speed: " + str(10-speed) + "/10")
+                        stdscr.refresh()
+                        char = stdscr.getch()
+                        if char == ord('p'):
+                            direction = 0
+                        elif char == ord('f'):
+                            direction = 1
+                        elif char == ord('r'):
+                            direction = -1
+                        elif char == ord('c'):
+                            break
+                        elif char == ord('d') and int(speed) < 10:
+                            speed += 1
+                        elif char == ord('g') and speed > 0:
+                            speed -= 1
                 if char == ord('b'):
-                    bookmarks.append(pointer)
+                    bookmarks.append([words[pointer], pointer])
                 if char == ord('e'):
                     quit(0)
                 if char == ord('j'):
                     if len(bookmarks) == 0:
                         continue
-                    stdscr.clear()
+                    stdscr.erase()
                     stdscr.addstr(2, 2, "Jumping bookmarks.")
                     stdscr.addstr(3, 2, "Available bookmarks: 1 through " + str(len(bookmarks)))
                     stdscr.addstr(4, 2, "d: done")
@@ -96,7 +169,7 @@ def iterate_over_words(rows, cols, stdscr):
                             mark += entry
                         if entry == "d":
                             if mark != "" and int(mark) - 1 < len(bookmarks):
-                                pointer = bookmarks[int(mark)-1]
+                                pointer = bookmarks[int(mark)-1][1]
                                 break
                             elif mark != "":
                                 mark = ""
@@ -118,13 +191,13 @@ def draw_word_bar(rows, col_start, col_end, stdscr):
     if max_ptr >= len(words):
         max_ptr = len(words) - 1
     num_cols = col_end - col_start + 1
-    stdscr.addstr(center_row, col_start, crop("> " + clean_word(words[pointer]), num_cols))
+    stdscr.addstr(center_row, col_start, crop("> " + words[pointer], num_cols))
     current_row = center_row - 1
     while current_row >= 0:
         bar_ptr -= 1
         if bar_ptr < min_ptr:
             break
-        stdscr.addstr(current_row, col_start, crop(clean_word(words[bar_ptr]), num_cols))
+        stdscr.addstr(current_row, col_start, crop(words[bar_ptr], num_cols))
         current_row -= 1
     current_row = center_row + 1
     bar_ptr = pointer
@@ -132,14 +205,8 @@ def draw_word_bar(rows, col_start, col_end, stdscr):
         bar_ptr += 1
         if bar_ptr > max_ptr:
             break
-        stdscr.addstr(current_row, col_start, crop(clean_word(words[bar_ptr]), num_cols))
+        stdscr.addstr(current_row, col_start, crop(words[bar_ptr], num_cols))
         current_row += 1
-
-def clean_word(word):
-    word = word.replace("\n", " ")
-    word = word.replace("\r", " ")
-    word = word.strip()
-    return word
         
 def crop(word, allowed_length):
     if len(word) > allowed_length:
@@ -150,13 +217,15 @@ def draw_next_word(rows, cols, stdscr):
     global words
     global pointer
 
-    v = clean_word(words[pointer])
+    v = words[pointer]
     if len(v) > cols:
         v = crop(v, cols)
     stdscr.clear()
     stdscr.addstr(int(rows/2), int(cols/2-len(v)/2), v)
     stdscr.refresh()
     pointer += 1
+    if pointer >= len(words):
+        pointer = len(words) - 1
     
 def main(stdscr):
     rows, cols = stdscr.getmaxyx()
@@ -179,4 +248,6 @@ def main(stdscr):
     while True:
         continue #Wait for input to generate an exception
 
+load_words()
+#auto_bookmark(["Chapter|CHAPTER", "[A-Z]*\."])
 wrapper(main)
