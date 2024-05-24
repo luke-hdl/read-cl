@@ -12,14 +12,18 @@ pointer = 0
 save_file_name = ""
 
 args_count = len(sys.argv)
-if args_count != 3: #Including the program name.
-    print("Please include exactly two arguments: the file to read and the WPM.")
+
+if (args_count < 5 or sys.argv[2] != '-bookmark') and (args_count != 3):
+    print("To read, include exactly two arguments: the file to read and the WPM.")
+    print("To auto-bookmark, begin with the filename, then -bookmark,, e.g. my_file.epub -bookmark CHAPTER|Chapter [A-Z]*\.")
+    print("Optionally, after bookmark, you can include -append to append.")
     quit(1)
 
 if not os.path.exists(".saves/"):
     os.mkdir(".saves/")
     
-sleep_time = 60/int(sys.argv[2])
+if sys.argv[2].isnumeric():
+    sleep_time = 60/int(sys.argv[2])
 
 def load_words():
     global bookmarks
@@ -66,7 +70,7 @@ def auto_bookmark(regexes):
             if re.search(regex, words[i2]) == None:
                 match = False
                 break
-            name += words[i2]
+            name += words[i2] + " "
             i2 += 1
         if match == True:
             marks.append([name, i])
@@ -74,7 +78,7 @@ def auto_bookmark(regexes):
         else:
             i += 1
     bookmarks += marks
-        
+    
 def iterate_over_words(rows, cols, stdscr):
     global words
     global pointer
@@ -249,5 +253,21 @@ def main(stdscr):
         continue #Wait for input to generate an exception
 
 load_words()
-#auto_bookmark(["Chapter|CHAPTER", "[A-Z]*\."])
+if args_count > 4 and sys.argv[2] == "-bookmark":
+    mode = "w"
+    regexes = sys.argv[3:]
+    if sys.argv[3] == "-append":
+        mode = "a"
+        regexes = regexes[1:]
+    bookmarks = []
+    auto_bookmark(regexes)
+    print("Found " + str(len(bookmarks)) + " bookmarks.")
+    if len(bookmarks) == 0:
+        quit(0)
+    fl = open(save_file_name, mode)
+    for bookmark in bookmarks:
+        fl.write(bookmark[0] + "\t" + str(bookmark[1]) + "\n")
+    fl.close()
+    quit(0)
+
 wrapper(main)
