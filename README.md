@@ -2,7 +2,7 @@
 
 A very simple implementation of single-word speedreading. I wasn't happy with existing Android options, and developing a command-line solution for use with UserLAnd was a practical, quick way for my simple use case. Ad-free and privacy-preserving - like you'd expect from a basic text file reader!
 
-Limited epub support included. Other file formats will be added as I get annoyed about wanting to read them. Supports fast-forward, rewind, and bookmarking, including a regex auto-bookmark command feature. 
+Limited pdf and epub support included. Other file formats will be added as I get annoyed about wanting to read them. Supports fast-forward, rewind, and bookmarking, including a regex auto-bookmark command feature. 
 
 ## Dependencies
 ```

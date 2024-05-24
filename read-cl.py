@@ -36,7 +36,7 @@ def load_words():
     global words
     global save_file_name
     contents = ""
-    if sys.argv[1].endswith(".epub"):
+    if sys.argv[1].endswith(".epub") or sys.argv[1].endswith(".pdf"):
         contents = textract.process(sys.argv[1], encoding='utf-8').decode()
 
     else:
