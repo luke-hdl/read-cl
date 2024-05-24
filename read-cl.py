@@ -14,9 +14,12 @@ save_file_name = ""
 args_count = len(sys.argv)
 
 if (args_count < 5 or sys.argv[2] != '-bookmark') and (args_count != 3):
-    print("To read, include exactly two arguments: the file to read and the WPM.")
-    print("To auto-bookmark, begin with the filename, then -bookmark,, e.g. my_file.epub -bookmark CHAPTER|Chapter [A-Z]*\.")
+    print("To read, include exactly two arguments: the file to read and the WPM. For instance: ")
+    print("python3 read-cl.py my_file.epub 300")
+    print("To auto-bookmark, begin with the filename, then -bookmark, then regexes for each consecutive word you want to match (these can't match on spaces). For instance, for a chapter book with numbered chapters:")
+    print("python3 read-cl.py my_file.epub -bookmark 'CHAPTER|Chapter' '[0-9]*'")
     print("Optionally, after bookmark, you can include -append to append.")
+    print("To pause and access bookmarks, fast-forward, etc., press p at any time while reading.")
     quit(1)
 
 if not os.path.exists(".saves/"):
@@ -24,6 +27,9 @@ if not os.path.exists(".saves/"):
     
 if sys.argv[2].isnumeric():
     sleep_time = 60/int(sys.argv[2])
+
+def bookmark_order(mark):
+    return mark[1]
 
 def load_words():
     global bookmarks
@@ -55,6 +61,8 @@ def load_words():
                 if len(raw) == 2:
                     bookmarks.append([raw[0], int(raw[1])])
         save.close()
+
+    bookmarks.sort(key=bookmark_order)
 
 def auto_bookmark(regexes):
     global bookmarks
@@ -99,7 +107,7 @@ def iterate_over_words(rows, cols, stdscr):
                 if len(bookmarks) > 0:
                     stdscr.addstr(8, 3, "s: save bookmarks file")
                     stdscr.addstr(9, 3, "j: jump to bookmark")
-                draw_word_bar(rows, 30, cols - 1, stdscr)
+                draw_text_bar(rows, 30, cols - 1, stdscr, pointer, words)
             
                 char = stdscr.getch()
                 while char == -1:
@@ -126,7 +134,7 @@ def iterate_over_words(rows, cols, stdscr):
                             pointer = 0
                         sleep(60/10000*speed)
                         stdscr.erase()
-                        draw_word_bar(rows, 30, cols - 1, stdscr)
+                        draw_text_bar(rows, 30, cols - 1, stdscr, pointer, words)
                         stdscr.addstr(2, 2, "p: pause")
                         stdscr.addstr(3, 2, "c: cancel/exit")
                         stdscr.addstr(4, 2, "r: go backwards")
@@ -149,43 +157,53 @@ def iterate_over_words(rows, cols, stdscr):
                         elif char == ord('g') and speed > 0:
                             speed -= 1
                 if char == ord('b'):
-                    bookmarks.append([words[pointer], pointer])
+                    bookmarks.append([words[pointer] + " (" + str(pointer) + ")", pointer])
+                    bookmarks.sort(key=bookmark_order)
                 if char == ord('e'):
                     quit(0)
                 if char == ord('j'):
                     if len(bookmarks) == 0:
                         continue
-                    stdscr.erase()
-                    stdscr.addstr(2, 2, "Jumping bookmarks.")
-                    stdscr.addstr(3, 2, "Available bookmarks: 1 through " + str(len(bookmarks)))
-                    stdscr.addstr(4, 2, "d: done")
-                    stdscr.addstr(5, 2, "c: cancel")
-                    stdscr.addstr(6, 2, "Your entry:")
-                    stdscr.refresh()
-                    mark = ""
+                    bookmark_names = []
+                    for bookmark in bookmarks:
+                        bookmark_names.append(bookmark[0])
+                    bookmark_pointer = 0
                     while True:
-                        stdscr.addstr(6, 14, mark)
-                        entry = stdscr.getch()
-                        while entry == -1:
-                            entry = stdscr.getch()
-                        entry = "" + chr(entry)
-                        if entry.isnumeric() and len(mark) < 10:
-                            mark += entry
-                        if entry == "d":
-                            if mark != "" and int(mark) - 1 < len(bookmarks):
-                                pointer = bookmarks[int(mark)-1][1]
-                                break
-                            elif mark != "":
-                                mark = ""
-                                stdscr.addstr(6, 14, "           ")
-                                stdscr.addstr(8, 2, "Invalid bookmark.")
-                                stdscr.refresh()
+                        stdscr.erase()
+                        draw_text_bar(rows, 30, cols-1, stdscr, bookmark_pointer, bookmark_names)
+                        stdscr.addstr(2, 2, "Jumping bookmarks.")
+                        stdscr.addstr(3, 2, "u: scroll up")
+                        stdscr.addstr(4, 2, "d: scroll down")
+                        stdscr.addstr(5, 2, "c: cancel")
+                        stdscr.addstr(6, 2, "g: go jump")
+                        stdscr.addstr(7, 2, "l: delete bookmark")
+                        stdscr.refresh()
+
+                        raw_entry = stdscr.getch()
+                        if raw_entry == -1:
+                            continue
+                        entry = str(chr(raw_entry))
                         if entry == "c":
                             break
+                        if entry == "d":
+                            bookmark_pointer += 1
+                            if bookmark_pointer >= len(bookmark_names):
+                                bookmark_pointer = len(bookmark_names) - 1
+                        if entry == "u":
+                            bookmark_pointer -= 1
+                            if bookmark_pointer < 0:
+                                bookmark_pointer = 0
+                        if entry == "g":
+                            pointer = bookmarks[bookmark_pointer][1]
+                            break
+                        if entry == "l":
+                            del bookmarks[bookmark_pointer]
+                            del bookmark_names[bookmark_pointer]
+                            if bookmark_pointer >= len(bookmark_names):
+                                bookmark_pointer = len(bookmark_names) - 1
         sleep(sleep_time)
 
-def draw_word_bar(rows, col_start, col_end, stdscr):
-    global pointer
+def draw_text_bar(rows, col_start, col_end, stdscr, pointer, words):
     center_row = int(rows/2)
     bar_ptr = pointer
     min_ptr = pointer - center_row
@@ -211,7 +229,7 @@ def draw_word_bar(rows, col_start, col_end, stdscr):
             break
         stdscr.addstr(current_row, col_start, crop(words[bar_ptr], num_cols))
         current_row += 1
-        
+
 def crop(word, allowed_length):
     if len(word) > allowed_length:
         return word[:allowed_length - 4] + "..."
@@ -230,11 +248,12 @@ def draw_next_word(rows, cols, stdscr):
     pointer += 1
     if pointer >= len(words):
         pointer = len(words) - 1
-    
+
+
 def main(stdscr):
     rows, cols = stdscr.getmaxyx()
     if rows < 10 or cols < 40:
-        print("Your screen is too small to use read-cl.")
+        print("Your screen is too small to use read-cl. Minimum size: 10x40.")
         quit(1)
     stdscr.nodelay(True)
     global words
@@ -251,6 +270,7 @@ def main(stdscr):
 
     while True:
         continue #Wait for input to generate an exception
+
 
 load_words()
 if args_count > 4 and sys.argv[2] == "-bookmark":
