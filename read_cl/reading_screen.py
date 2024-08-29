@@ -20,6 +20,3 @@ class ReadingScreen:
             self.reader.current_screen = pause_screen.PauseScreen(self.reader)
         else:
             self.reader.increment_pointer(1)
-
-def id_name():
-    return "ReadingScreen"

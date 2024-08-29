@@ -30,15 +30,18 @@ class Reader:
     def get_current_word(self):
         return self.book.words[self.pointer]
 
-    def increment_pointer(self, by_number):
-        new_pointer = self.pointer + by_number
+    def set_pointer(self, to_number):
+        new_pointer = to_number
         if new_pointer < 0:
             new_pointer = 0
 
         if new_pointer >= len(self.book.words):
-            new_pointer = len(self.book.words - 1)
+            new_pointer = len(self.book.words) - 1
 
         self.pointer = new_pointer
+
+    def increment_pointer(self, by_number):
+        self.set_pointer(self.pointer + by_number)
 
 
 

@@ -15,9 +15,9 @@ args_count = len(sys.argv)
 
 if (args_count < 5 or sys.argv[2] != '-bookmark') and (args_count != 3):
     print("To read, include exactly two arguments: the file to read and the WPM. For instance: ")
-    print("python3 read-cl.py my_file.epub 300")
+    print("python3 read_cl.py my_file.epub 300")
     print("To auto-bookmark, begin with the filename, then -bookmark, then regexes for each consecutive word you want to match (these can't match on spaces). For instance, for a chapter book with numbered chapters:")
-    print("python3 read-cl.py my_file.epub -bookmark 'CHAPTER|Chapter' '[0-9]*'")
+    print("python3 read_cl.py my_file.epub -bookmark 'CHAPTER|Chapter' '[0-9]*'")
     print("Optionally, after bookmark, you can include -append to append.")
     print("To pause and access bookmarks, fast-forward, etc., press p at any time while reading.")
     quit(1)
@@ -253,7 +253,7 @@ def draw_next_word(rows, cols, stdscr):
 def main(stdscr):
     rows, cols = stdscr.getmaxyx()
     if rows < 10 or cols < 40:
-        print("Your screen is too small to use read-cl. Minimum size: 10x40.")
+        print("Your screen is too small to use read_cl. Minimum size: 10x40.")
         quit(1)
     stdscr.nodelay(True)
     global words
@@ -272,22 +272,5 @@ def main(stdscr):
         continue #Wait for input to generate an exception
 
 
-load_words()
-if args_count > 4 and sys.argv[2] == "-bookmark":
-    mode = "w"
-    regexes = sys.argv[3:]
-    if sys.argv[3] == "-append":
-        mode = "a"
-        regexes = regexes[1:]
-    bookmarks = []
-    auto_bookmark(regexes)
-    print("Found " + str(len(bookmarks)) + " bookmarks.")
-    if len(bookmarks) == 0:
-        quit(0)
-    fl = open(save_file_name, mode)
-    for bookmark in bookmarks:
-        fl.write(bookmark[0] + "\t" + str(bookmark[1]) + "\n")
-    fl.close()
-    quit(0)
 
 wrapper(main)

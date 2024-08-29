@@ -1,5 +1,7 @@
 from screen_utils import crop, draw_text_bar
 import reading_screen
+import fast_forward_screen
+import jump_screen
 from book_io import save_bookmarks
 
 class PauseScreen:
@@ -22,16 +24,25 @@ class PauseScreen:
         draw_text_bar(dimensions[0], 30, dimensions[1] - 1, stdscr, self.reader.pointer, self.reader.book.words)
 
     def should_act(self, acting_at, input):
-        return input in [ord('q'), ord('s')]
+        return input in [ord('q'), ord('s'), ord('b'), ord('e'), ord('f'), ord('r'), ord('j')]
 
     def act(self, input):
         if input == ord('q'):
             self.reader.current_screen = reading_screen.ReadingScreen(self.reader)
             return
         if input == ord('s'):
-            if len(self.book.bookmarks) == 0:
+            if len(self.reader.book.bookmarks) == 0:
                 return
-            save_bookmarks(self.book)
-
-def id_name():
-    return "ReadingScreen"
+            save_bookmarks(self.reader.book)
+        if input == ord('b'):
+            self.reader.book.add_bookmarks([[self.reader.book.words[self.reader.pointer] + " (" + str(self.reader.pointer) + ")", self.reader.pointer]])
+        if input == ord('e'):
+            quit(0)
+        if input == ord('f'):
+            self.reader.current_screen = fast_forward_screen.FastForwardScreen(self.reader, 1)
+        if input == ord('r'):
+            self.reader.current_screen = fast_forward_screen.FastForwardScreen(self.reader, -1)
+        if input == ord('j'):
+            if len(self.reader.book.bookmarks) == 0:
+                return
+            self.reader.current_screen = jump_screen.JumpScreen(self.reader)
