@@ -17,10 +17,6 @@ class FastForwardScreen:
         stdscr.addstr(7, 2, "g: faster")
         stdscr.addstr(8, 2, "Your speed: " + str(10 - self.speed) + "/10")
 
-        if len(self.reader.book.bookmarks) > 0:
-            stdscr.addstr(8, 3, "s: save bookmarks file")
-            stdscr.addstr(9, 3, "j: jump to bookmark")
-
         dimensions = self.reader.viewpoint.get_dimensions()
         draw_text_bar(dimensions[0], 30, dimensions[1] - 1, stdscr, self.reader.pointer, self.reader.book.words)
 

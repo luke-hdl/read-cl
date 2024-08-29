@@ -27,9 +27,9 @@ class JumpScreen:
 
     def act(self, input):
         if input == ord('u'):
-            self.increment_pointer(1)
-        if input == ord('d'):
             self.increment_pointer(-1)
+        if input == ord('d'):
+            self.increment_pointer(1)
         if input == ord('c'):
             self.reader.current_screen = pause_screen.PauseScreen(self.reader)
         if input == ord('g'):

@@ -5,7 +5,7 @@ class Viewpoint:
         self.stdscr = stdscr
 
     def draw(self, screen):
-        self.stdscr.clear()
+        self.stdscr.erase()
         screen.draw(self.stdscr)
         self.stdscr.refresh()
 

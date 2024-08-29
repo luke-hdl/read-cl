@@ -20,6 +20,21 @@ def process_arguments():
     if not os.path.exists(".saves/"):
         os.mkdir(".saves/")
 
+    book = book_io.load_words()
+    if args_count > 4 and sys.argv[2] == "-bookmark":
+        replace_existing = False
+        regexes = sys.argv[3:]
+        if regexes[0] == "--replace":
+            regexes = regexes[1:]
+            replace_existing = True
+
+        book.auto_bookmark(regexes, replace_existing)
+        print("Your book now has " + str(len(book.bookmarks)) + " bookmarks. Enjoy!")
+        if len(book.bookmarks) == 0:
+            quit(0)
+        book_io.save_bookmarks(book)
+        quit(0)
+
     sleep_time = 0
     if sys.argv[2].isnumeric():
         target_wpm = int(sys.argv[2])
@@ -31,21 +46,6 @@ def process_arguments():
         print("python3 read_cl.py my_file.epub 300")
         print("Your words per minute needs to be a number, like 100, 200, or 300. It can't be negative or 0.")
         quit(1)
-
-    book = book_io.load_words()
-    if args_count > 4 and sys.argv[2] == "-bookmark":
-        replace_existing = False
-        regexes = sys.argv[3:]
-        if regexes[0] == "--replace":
-            regexes = regexes[1:]
-            replace_existing = True
-
-        book.auto_bookmark(regexes, replace_existing)
-        print("Your book now has " + len(book.bookmarks) + " bookmarks. Enjoy!")
-        if len(book.bookmarks) == 0:
-            quit(0)
-        book_io.save_bookmarks(book)
-        quit(0)
 
     return reader.Reader(book, sleep_time)
 
