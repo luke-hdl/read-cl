@@ -5,10 +5,20 @@ A very simple implementation of single-word speedreading. I wasn't happy with ex
 Limited pdf and epub support included. Other file formats will be added as I get annoyed about wanting to read them. Supports fast-forward, rewind, and bookmarking, including a regex auto-bookmark command feature. 
 
 ## Dependencies
+read-cl depends on Textract. Unfortunately, the library is not maintained. It's not terrible to get it running, but the version available to pip will generally fail to install due to use of a no-longer-supported syntax. You can attempt
 ```
 pip install textract
 ```
 
+Failing that, 
+
+https://github.com/deanmalmgren/textract/issues/525
+
+has a workaround to set it up; follow the advice given, and remember to also 
+```
+pip install .
+```
+in textract's directory at the end. 
 ## Usage
 
 ```
