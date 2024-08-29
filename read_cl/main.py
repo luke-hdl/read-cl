@@ -1,4 +1,5 @@
 import sys
+from sys import exit
 import os
 import book_io
 import reader
@@ -15,7 +16,7 @@ def process_arguments():
         print("python3 read_cl.py my_file.epub -bookmark 'CHAPTER|Chapter' '[0-9]*'")
         print("Optionally, after bookmark, you can include -append to append.")
         print("To pause and access bookmarks, fast-forward, etc., press p at any time while reading.")
-        quit(1)
+        exit(1)
 
     if not os.path.exists(".saves/"):
         os.mkdir(".saves/")
@@ -31,9 +32,9 @@ def process_arguments():
         book.auto_bookmark(regexes, replace_existing)
         print("Your book now has " + str(len(book.bookmarks)) + " bookmarks. Enjoy!")
         if len(book.bookmarks) == 0:
-            quit(0)
+            exit(0)
         book_io.save_bookmarks(book)
-        quit(0)
+        exit(0)
 
     sleep_time = 0
     if sys.argv[2].isnumeric():
@@ -45,7 +46,7 @@ def process_arguments():
         print("To read, include exactly two arguments: the file to read and the WPM. For instance: ")
         print("python3 read_cl.py my_file.epub 300")
         print("Your words per minute needs to be a number, like 100, 200, or 300. It can't be negative or 0.")
-        quit(1)
+        exit(1)
 
     return reader.Reader(book, sleep_time)
 
@@ -55,7 +56,7 @@ def main(stdscr):
     rows, cols = stdscr.getmaxyx()
     if rows < 10 or cols < 40:
         print("Your screen is too small to use read_cl. Minimum size: 10x40.")
-        quit(1)
+        exit(1)
     stdscr.nodelay(True)
     curs_set(0)
     reader_main.start(stdscr)

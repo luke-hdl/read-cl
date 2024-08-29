@@ -18,7 +18,7 @@ has a workaround to set it up; follow the advice given, and remember to also
 ```
 pip install .
 ```
-in textract's directory at the end. 
+in textract's directory at the end. Alternatively, see Releases; these have the textract dependency bundled. 
 ## Usage
 
 ```
@@ -40,3 +40,13 @@ python3 read_cl/main.py samples/pride2.epub -bookmark 'Chapter|CHAPTER' '[A-Z]*\
 ```
 
 Each regex given after the -bookmark and optional -append flag (which adds the bookmarks to your bookmark file instead of overwriting it) matches to a consecutive word that would flash across your screen. If a series of consecutive words matches them consecutively, a bookmark is created. It will be named exactly what was matched in the bookmarks jumper. 
+
+## Releases
+Releases are generated using 
+```
+pyinstaller main.py --collect-submodules textract
+```
+
+and include all dependencies. Should be set-and-forget, for the most part. The only release that's standard available for read-cl is targeted for 64-bit Debian Linux systems.
+
+The current release product doesn't correctly print help text in all cases. I'm planning on updating this "when I get around to it", but it's not a super high priority issue. 

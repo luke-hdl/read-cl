@@ -1,8 +1,9 @@
-from screen_utils import crop, draw_text_bar
+from screen_utils import draw_text_bar
 import reading_screen
 import fast_forward_screen
 import jump_screen
 from book_io import save_bookmarks
+from sys import exit
 
 class PauseScreen:
     def __init__(self, reader):
@@ -37,7 +38,7 @@ class PauseScreen:
         if input == ord('b'):
             self.reader.book.add_bookmarks([[self.reader.book.words[self.reader.pointer] + " (" + str(self.reader.pointer) + ")", self.reader.pointer]])
         if input == ord('e'):
-            quit(0)
+            exit(0)
         if input == ord('f'):
             self.reader.current_screen = fast_forward_screen.FastForwardScreen(self.reader, 1)
         if input == ord('r'):

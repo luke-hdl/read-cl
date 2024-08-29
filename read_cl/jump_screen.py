@@ -1,5 +1,6 @@
 from screen_utils import draw_text_bar
 import pause_screen
+from sys import exit
 
 class JumpScreen:
     def __init__(self, reader):
@@ -40,7 +41,7 @@ class JumpScreen:
             del self.bookmark_names[self.bookmark_pointer]
             self.increment_pointer(0)
         if input == ord('e'):
-            quit(0)
+            exit(0)
 
     def increment_pointer(self, by_number):
         new_pointer = self.bookmark_pointer + by_number
