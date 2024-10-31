@@ -4,23 +4,14 @@ A very simple implementation of single-word speedreading. I wasn't happy with ex
 
 Limited pdf and epub support included. Other file formats will be added as I get annoyed about wanting to read them. Supports fast-forward, rewind, and bookmarking, including a regex auto-bookmark command feature. 
 
-## Dependencies
-read-cl depends on Textract. Unfortunately, the library is not maintained. It's not terrible to get it running, but the version available to pip will generally fail to install due to use of a no-longer-supported syntax. You can attempt
-```
-pip install textract
-```
-
-Failing that, 
-
-https://github.com/deanmalmgren/textract/issues/525
-
-has a workaround to set it up; follow the advice given, and remember to also 
-```
-pip install .
-```
-in textract's directory at the end. Alternatively, see Releases; these have the textract dependency bundled. 
 ## Usage
 
+Release candidate (via Windows Command Line or PowerShell): 
+```
+read_cl.exe ./samples/pride2.epub wpm
+```
+
+With Python: 
 ```
 python3 read_cl/main.py path/to/your/file.txt wpm
 ```
@@ -36,17 +27,43 @@ Press p to pause, which will let you set, jump to, delete, and save bookmarks, p
 
 You can automatically set bookmarks:
 ```
-python3 read_cl/main.py samples/pride2.epub -bookmark 'Chapter|CHAPTER' '[A-Z]*\.'
+read_cl.exe ./samples/pride2.epub -bookmark 'Chapter|CHAPTER' '[A-Z]*/.'
+```
+or
+```
+python3 read_cl/main.py samples/pride2.epub -bookmark 'Chapter|CHAPTER' '[A-Z]*/.'
 ```
 
 Each regex given after the -bookmark and optional -append flag (which adds the bookmarks to your bookmark file instead of overwriting it) matches to a consecutive word that would flash across your screen. If a series of consecutive words matches them consecutively, a bookmark is created. It will be named exactly what was matched in the bookmarks jumper. 
 
+
+## Dependencies
+read-cl depends on Textract. Unfortunately, the library is not maintained. It's not terrible to get it running, but the version available to pip will generally fail to install due to use of a no-longer-supported syntax. You can attempt
+```
+pip install textract
+```
+
+Failing that, 
+
+https://github.com/deanmalmgren/textract/issues/525
+
+has a workaround to set it up; follow the advice given, and remember to also 
+```
+pip install .
+```
+in textract's directory at the end. Alternatively, see Releases; these have the textract dependency bundled. 
+
 ## Releases
 Releases are generated using 
 ```
-pyinstaller main.py --collect-submodules textract
+pyinstaller read_cl/main.py --onefile --collect-submodules textract
 ```
 
-and include all dependencies. Should be set-and-forget, for the most part. The only release that's standard available for read-cl is targeted for 64-bit Debian Linux systems.
+For Windows, this is instead:
+```
+pyinstaller read_cl/main.py --onefile --collect-submodules textract --collect-submodules windows-curses
+```
 
-The current release product doesn't correctly print help text in all cases. I'm planning on updating this "when I get around to it", but it's not a super high priority issue. 
+and include all dependencies. 
+
+read_cl.exe, found in /release/, should run on Windows systems. As I'm using Windows Subsystem for Linux for Linux testing, there isn't a functioning release right now. I'll be posting one for Debian 64x systems at a later time, once I find my laptop charger. 
