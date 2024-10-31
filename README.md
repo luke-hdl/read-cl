@@ -19,6 +19,13 @@ has a workaround to set it up; follow the advice given, and remember to also
 pip install .
 ```
 in textract's directory at the end. 
+
+On Windows, you'll also need to run
+```
+pip install windows-curses
+```
+as the Curses that comes pre-installed on Python for Linux is platform-dependent. 
+
 ## Usage
 
 ```
