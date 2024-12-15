@@ -1,5 +1,9 @@
 #The directory bookmark files are saved in
 .saves/
 
-#Sometimes I develop on Pycharm. Not always, so I don't want to ignore it.
+#Build stuff
+build/
+dist/
+
+#Sometimes I develop on Pycharm. Not always, so I want to ignore it.
 .idea/
