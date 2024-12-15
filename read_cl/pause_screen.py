@@ -1,3 +1,4 @@
+import text_entry_screen
 from screen_utils import draw_text_bar
 import reading_screen
 import fast_forward_screen
@@ -16,16 +17,22 @@ class PauseScreen:
         stdscr.addstr(5, 3, "f: fast forward")
         stdscr.addstr(6, 3, "r: rewind")
         stdscr.addstr(7, 3, "e: exit")
+        stdscr.addstr(8, 3, "t: test text entry")
 
         if len(self.reader.book.bookmarks) > 0:
-            stdscr.addstr(8, 3, "s: save bookmarks file")
-            stdscr.addstr(9, 3, "j: jump to bookmark")
+            stdscr.addstr(9, 3, "s: save bookmarks file")
+            stdscr.addstr(10, 3, "j: jump to bookmark")
 
         dimensions = self.reader.viewpoint.get_dimensions()
         draw_text_bar(dimensions[0], 30, dimensions[1] - 1, stdscr, self.reader.pointer, self.reader.book.words)
 
+    def return_to_pause_screen(self):
+        self.reader.current_screen = self
+    def return_to_pause_screen_with_text(self, text):
+        self.reader.current_screen = self
+
     def should_act(self, acting_at, input):
-        return input in [ord('q'), ord('s'), ord('b'), ord('e'), ord('f'), ord('r'), ord('j')]
+        return input in [ord('q'), ord('s'), ord('b'), ord('e'), ord('f'), ord('r'), ord('j'), ord('t')]
 
     def act(self, input):
         if input == ord('q'):
@@ -47,3 +54,5 @@ class PauseScreen:
             if len(self.reader.book.bookmarks) == 0:
                 return
             self.reader.current_screen = jump_screen.JumpScreen(self.reader)
+        if input == ord('t'):
+            self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Test Entering Text:", self.return_to_pause_screen_with_text, self.return_to_pause_screen)
