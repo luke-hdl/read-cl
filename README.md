@@ -6,6 +6,19 @@ Limited pdf and epub support included. Other file formats will be added as I get
 
 ## Usage
 
+The program can be run directly from the command line:
+```commandline
+read_cl.exe
+```
+or 
+```commandline
+python3 read_cl/main.py
+```
+
+then, follow the directions to enter a path and WPM, and optionally auto-bookmark.
+
+You can also pass in arguments, as follows: 
+
 Release candidate (via Windows Command Line or PowerShell): 
 ```
 read_cl.exe ./samples/pride2.epub wpm
