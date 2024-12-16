@@ -36,7 +36,7 @@ class JumpScreen:
         if input == ord('g'):
             self.reader.pointer = self.reader.book.bookmarks[self.bookmark_pointer][1]
             self.reader.current_screen = pause_screen.PauseScreen(self.reader)
-        if input == ord('l'):
+        if input == ord('l') and len(self.reader.book.bookmarks) > 0:
             del self.reader.book.bookmarks[self.bookmark_pointer]
             del self.bookmark_names[self.bookmark_pointer]
             self.increment_pointer(0)

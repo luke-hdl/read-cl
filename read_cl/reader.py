@@ -12,6 +12,9 @@ class Reader:
         self.target_seconds_between_words = target_seconds_between_words
         self.viewpoint = None
 
+    def set_wpm(self, wpm):
+        self.target_seconds_between_words = 60.0/float(wpm)
+
     def getch(self):
         return self.stdscr.getch()
 
