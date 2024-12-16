@@ -1,5 +1,6 @@
 from time import time
 
+from pause_screen import PauseScreen
 from reading_screen import ReadingScreen
 from viewpoint import Viewpoint
 
@@ -20,8 +21,11 @@ class Reader:
 
     def start(self, stdscr):
         self.viewpoint = Viewpoint(stdscr)
-        self.current_screen = ReadingScreen(self)
-        self.last_acted_on = 0.
+        if len(self.book.words) > 0:
+            self.current_screen = ReadingScreen(self)
+        else:
+            self.current_screen = PauseScreen(self)
+            self.viewpoint.draw(self.current_screen) #Needed due to some oddities with PauseScreen's implementation.
 
     def iterate(self):
         c = self.viewpoint.getch()
