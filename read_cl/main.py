@@ -21,7 +21,7 @@ def process_arguments():
     if not os.path.exists(".saves/"):
         os.mkdir(".saves/")
 
-    book = book_io.load_words()
+    book = book_io.load_words(sys.argv[1])
     if args_count > 4 and sys.argv[2] == "-bookmark":
         replace_existing = False
         regexes = sys.argv[3:]

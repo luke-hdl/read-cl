@@ -1,4 +1,5 @@
 import text_entry_screen
+import book_io
 from screen_utils import draw_text_bar
 import reading_screen
 import fast_forward_screen
@@ -17,11 +18,13 @@ class PauseScreen:
         stdscr.addstr(5, 3, "f: fast forward")
         stdscr.addstr(6, 3, "r: rewind")
         stdscr.addstr(7, 3, "e: exit")
-        stdscr.addstr(8, 3, "t: test text entry")
+        stdscr.addstr(8, 3, "w: set wpm")
+        stdscr.addstr(9, 3, "a: add autobookmarks")
+        stdscr.addstr(10, 3, "o: open book")
 
         if len(self.reader.book.bookmarks) > 0:
-            stdscr.addstr(9, 3, "s: save bookmarks file")
-            stdscr.addstr(10, 3, "j: jump to bookmark")
+            stdscr.addstr(11, 3, "s: save bookmarks file")
+            stdscr.addstr(12, 3, "j: jump to bookmark")
 
         dimensions = self.reader.viewpoint.get_dimensions()
         draw_text_bar(dimensions[0], 30, dimensions[1] - 1, stdscr, self.reader.pointer, self.reader.book.words)
@@ -31,8 +34,17 @@ class PauseScreen:
     def return_to_pause_screen_with_text(self, text):
         self.reader.current_screen = self
 
+    def load_book_and_pause(self, path):
+        try:
+            new_book = book_io.load_words(path)
+            self.reader.book = new_book
+            self.reader.pointer = 0
+            self.reader.current_screen = self
+        except Exception as e:
+            self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Couldn't find book. Try again:", self.load_book_and_pause, self.return_to_pause_screen)
+
     def should_act(self, acting_at, input):
-        return input in [ord('q'), ord('s'), ord('b'), ord('e'), ord('f'), ord('r'), ord('j'), ord('t')]
+        return input in [ord('q'), ord('s'), ord('b'), ord('e'), ord('f'), ord('r'), ord('j'), ord('w'), ord('a'), ord('o')]
 
     def act(self, input):
         if input == ord('q'):
@@ -54,5 +66,9 @@ class PauseScreen:
             if len(self.reader.book.bookmarks) == 0:
                 return
             self.reader.current_screen = jump_screen.JumpScreen(self.reader)
-        if input == ord('t'):
-            self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Test Entering Text:", self.return_to_pause_screen_with_text, self.return_to_pause_screen)
+        if input == ord('w'):
+            self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Enter WPM:", self.set_wpm_and_pause, self.return_to_pause_screen)
+        if input == ord('a'):
+            self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Enter regexes for autobookmarking (each regex, space-seperated, matches to a consecutive word):", self.autobookmark_and_pause, self.return_to_pause_screen)
+        if input == ord('o'):
+            self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Enter path to new book:", self.load_book_and_pause, self.return_to_pause_screen)

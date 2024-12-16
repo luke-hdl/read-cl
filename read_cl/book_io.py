@@ -1,17 +1,16 @@
-import sys
 import os
 import textract
 import hashlib
 import re
 from book import Book
 
-def load_words():
+def load_words(filepath):
     words = []
     bookmarks = []
-    if sys.argv[1].endswith(".epub") or sys.argv[1].endswith(".pdf"):
-        contents = textract.process(sys.argv[1], encoding='utf-8').decode()
+    if filepath.endswith(".epub") or filepath.endswith(".pdf"):
+        contents = textract.process(filepath, encoding='utf-8').decode()
     else:
-        file_to_read = open(sys.argv[1], "r")
+        file_to_read = open(filepath, "r")
         contents = file_to_read.read()
         file_to_read.close()
 
