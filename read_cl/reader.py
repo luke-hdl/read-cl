@@ -6,7 +6,7 @@ from viewpoint import Viewpoint
 
 class Reader:
     def __init__(self, book, target_seconds_between_words):
-        self.last_acted_on = None
+        self.last_acted_on = time()
         self.book = book
         self.pointer = -1
         self.current_screen = None
