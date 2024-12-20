@@ -1,5 +1,6 @@
 import text_entry_screen
 import book_io
+import remap_screen
 from screen_utils import draw_text_bar
 import reading_screen
 import fast_forward_screen
@@ -21,10 +22,11 @@ class PauseScreen:
         stdscr.addstr(8, 3, "w: set wpm")
         stdscr.addstr(9, 3, "a: add autobookmarks")
         stdscr.addstr(10, 3, "o: open book")
+        stdscr.addstr(11, 3, "m: map keys")
 
         if len(self.reader.book.bookmarks) > 0:
-            stdscr.addstr(11, 3, "s: save bookmarks file")
-            stdscr.addstr(12, 3, "j: jump to bookmark")
+            stdscr.addstr(12, 3, "s: save bookmarks file")
+            stdscr.addstr(13, 3, "j: jump to bookmark")
 
         dimensions = self.reader.viewpoint.get_dimensions()
         if len(self.reader.book.words) > 0:
@@ -50,16 +52,16 @@ class PauseScreen:
         self.reader.current_screen = self
 
     def load_book_and_pause(self, path):
-        #try:
+        try:
             new_book = book_io.load_words(path)
             self.reader.book = new_book
             self.reader.pointer = 0
             self.reader.current_screen = self
-        #except Exception as e:
-        #    self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Couldn't find book. Try again:", self.load_book_and_pause, self.return_to_pause_screen)
+        except Exception as e:
+            self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Couldn't find book. Try again:", self.load_book_and_pause, self.return_to_pause_screen)
 
     def should_act(self, acting_at, input):
-        return input in [ord('q'), ord('s'), ord('b'), ord('e'), ord('f'), ord('r'), ord('j'), ord('w'), ord('a'), ord('o')]
+        return input in [ord('q'), ord('s'), ord('b'), ord('e'), ord('f'), ord('r'), ord('j'), ord('w'), ord('a'), ord('o'), ord('m')]
 
     def act(self, input):
         if input == ord('q') and len(self.reader.book.words) > 0:
@@ -87,3 +89,5 @@ class PauseScreen:
             self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Enter regexes for autobookmarking:", self.autobookmark_and_pause, self.return_to_pause_screen)
         if input == ord('o'):
             self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Enter path to new book:", self.load_book_and_pause, self.return_to_pause_screen)
+        if input == ord('m'):
+            self.reader.current_screen = remap_screen.RemapScreen(self.reader,self)

@@ -1,3 +1,4 @@
+import curses
 from time import time
 
 from pause_screen import PauseScreen
@@ -12,6 +13,17 @@ class Reader:
         self.current_screen = None
         self.target_seconds_between_words = target_seconds_between_words
         self.viewpoint = None
+        self.override_mappings = {
+            curses.KEY_EXIT: curses.KEY_EXIT,
+            curses.KEY_ENTER: curses.KEY_ENTER,
+            curses.KEY_BACKSPACE: curses.KEY_BACKSPACE
+        }
+
+    def add_override_mapping(self,map_from,map_to):
+        self.override_mappings[map_from] = map_to
+
+    def get_override_mapping(self,map_from):
+        return self.override_mappings[map_from]
 
     def set_wpm(self, wpm):
         self.target_seconds_between_words = 60.0/float(wpm)
