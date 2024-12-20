@@ -1,8 +1,4 @@
 import curses
-from time import time
-
-from screen_utils import crop
-import pause_screen
 
 class TextEntryScreen:
     def __init__(self, reader, enter_text, on_finish, on_cancel):
@@ -25,11 +21,11 @@ class TextEntryScreen:
         return input != -1
 
     def act(self, input):
-        if input == curses.KEY_EXIT or input == 27:
+        if input == self.reader.get_override_mapping(curses.KEY_EXIT):
             self.on_cancel()
-        elif input == curses.KEY_ENTER or input == 10:
+        elif input == self.reader.get_override_mapping(curses.KEY_ENTER):
             self.on_finish(self.entry)
+        elif input == self.reader.get_override_mapping(curses.KEY_BACKSPACE):
+            self.entry = self.entry[0:len(self.entry)-1]
         elif 0 <= input < 255:
             self.entry += chr(input)
-        elif input == curses.KEY_BACKSPACE:
-            self.entry = self.entry[0:len(self.entry)-1]
