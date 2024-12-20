@@ -84,6 +84,6 @@ class PauseScreen:
         if input == ord('w'):
             self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Enter WPM:", self.set_wpm_and_pause, self.return_to_pause_screen)
         if input == ord('a') and len(self.reader.book.words) > 0:
-            self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Enter regexes for autobookmarking (each regex, space-seperated, matches to a consecutive word):", self.autobookmark_and_pause, self.return_to_pause_screen)
+            self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Enter regexes for autobookmarking:", self.autobookmark_and_pause, self.return_to_pause_screen)
         if input == ord('o'):
             self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Enter path to new book:", self.load_book_and_pause, self.return_to_pause_screen)
