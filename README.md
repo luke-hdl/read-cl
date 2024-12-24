@@ -77,6 +77,4 @@ For Windows, this is instead:
 pyinstaller read_cl/main.py --onefile --collect-submodules textract --collect-submodules windows-curses
 ```
 
-and include all dependencies. 
-
-read_cl.exe, found in /release/, should run on Windows systems. As I'm using Windows Subsystem for Linux for Linux testing, there isn't a functioning release right now. I'll be posting one for Debian 64x systems at a later time, once I find my laptop charger. 
+and include all dependencies. The default keybindings are set by hardcoding the correct variable into reader.py; I'll get around to working that out to use the spec file at a future date.

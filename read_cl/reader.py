@@ -1,7 +1,6 @@
-import curses
 from time import time
-
 from pause_screen import PauseScreen
+import default_keymappings
 from reading_screen import ReadingScreen
 from viewpoint import Viewpoint
 
@@ -13,11 +12,7 @@ class Reader:
         self.current_screen = None
         self.target_seconds_between_words = target_seconds_between_words
         self.viewpoint = None
-        self.override_mappings = {
-            curses.KEY_EXIT: curses.KEY_EXIT,
-            curses.KEY_ENTER: curses.KEY_ENTER,
-            curses.KEY_BACKSPACE: curses.KEY_BACKSPACE
-        }
+        self.override_mappings = default_keymappings.none
 
     def add_override_mapping(self,map_from,map_to):
         self.override_mappings[map_from] = map_to
