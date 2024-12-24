@@ -48,8 +48,8 @@ def process_arguments():
 def main(stdscr):
     reader_main = process_arguments()
     rows, cols = stdscr.getmaxyx()
-    if rows < 10 or cols < 40:
-        print("Your screen is too small to use read_cl. Minimum size: 10x40.")
+    if rows < 15 or cols < 40:
+        print("Your screen is too small to use read_cl. Minimum size: 15x40.")
         exit(1)
     stdscr.nodelay(True)
     curs_set(0)
