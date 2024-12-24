@@ -1,3 +1,4 @@
+import book_io
 from screen_utils import crop
 import pause_screen
 
@@ -20,3 +21,5 @@ class ReadingScreen:
             self.reader.current_screen = pause_screen.PauseScreen(self.reader)
         else:
             self.reader.increment_pointer(1)
+            if self.reader.pointer % 10 == 0:
+                book_io.save_autosave_bookmark(self.reader.book, self.reader.pointer)

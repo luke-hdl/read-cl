@@ -1,6 +1,7 @@
 import re
 
 class Book:
+    special_bookmark_names = ["Start", "Auto"]
     def __init__(self, words, bookmarks, save_file_name):
         self.words = words
         self.save_file_name = save_file_name
@@ -8,6 +9,10 @@ class Book:
         self.load_bookmarks(bookmarks)
 
     def bookmark_order(self, mark):
+        if mark[0] == "Start":
+            return -2
+        if mark[0] == "Auto":
+            return -1
         return mark[1]
 
     def load_bookmarks(self, new_bookmarks):
@@ -15,6 +20,8 @@ class Book:
         self.bookmarks.sort(key=self.bookmark_order)
 
     def add_bookmarks(self, new_bookmarks):
+        if new_bookmarks[0] in self.special_bookmark_names:
+            new_bookmarks[0] = new_bookmarks[0] + "*"
         self.bookmarks += new_bookmarks;
         self.bookmarks.sort(key=self.bookmark_order)
 
