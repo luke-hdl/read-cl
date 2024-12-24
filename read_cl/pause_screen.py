@@ -16,15 +16,15 @@ class PauseScreen:
     def draw(self, stdscr):
         stdscr.addstr(2, 2, "Reading paused.")
         stdscr.addstr(3, 3, "q: unpause")
-        stdscr.addstr(4, 3, "b: set Bookmark")
-        stdscr.addstr(5, 3, "f: fast Forward")
-        stdscr.addstr(6, 3, "r: Rewind")
-        stdscr.addstr(7, 3, "e: Exit")
-        stdscr.addstr(8, 3, "w: set Wpm")
-        stdscr.addstr(9, 3, "a: add Autobookmarks")
-        stdscr.addstr(10, 3, "o: Open book")
-        stdscr.addstr(11, 3, "m: Map keys")
-        stdscr.addstr(12, 3, "c: seaCh")
+        stdscr.addstr(4, 3, "b: set bookmark")
+        stdscr.addstr(5, 3, "f: fast forward")
+        stdscr.addstr(6, 3, "r: rewind")
+        stdscr.addstr(7, 3, "e: exit")
+        stdscr.addstr(8, 3, "w: set wpm")
+        stdscr.addstr(9, 3, "a: add autobookmarks")
+        stdscr.addstr(10, 3, "o: open book")
+        stdscr.addstr(11, 3, "m: map keys")
+        stdscr.addstr(12, 3, "c: seach")
 
         if len(self.reader.book.bookmarks) > 0:
             stdscr.addstr(13, 3, "s: Save bookmarks file")
@@ -69,7 +69,10 @@ class PauseScreen:
         try:
             new_book = book_io.load_words(path)
             self.reader.book = new_book
-            self.reader.pointer = 0
+            if len(new_book.bookmarks) > 1 and new_book.bookmarks[1][0] == "Auto":
+                self.reader.pointer = new_book.bookmarks[1][1]
+            else:
+                self.reader.pointer = 0
             self.reader.current_screen = self
         except Exception as e:
             self.reader.current_screen = text_entry_screen.TextEntryScreen(self.reader,"Couldn't find book. Try again:", self.load_book_and_pause, self.return_to_pause_screen)

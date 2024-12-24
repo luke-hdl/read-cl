@@ -1,7 +1,6 @@
 from time import time
 from pause_screen import PauseScreen
 import default_keymappings
-from reading_screen import ReadingScreen
 from viewpoint import Viewpoint
 
 class Reader:
@@ -9,6 +8,8 @@ class Reader:
         self.last_acted_on = time()
         self.book = book
         self.pointer = -1
+        if len(self.book.bookmarks) > 1 and self.book.bookmarks[1][0] == "Auto":
+            self.pointer = self.book.bookmarks[1][1]
         self.current_screen = None
         self.target_seconds_between_words = target_seconds_between_words
         self.viewpoint = None
@@ -28,11 +29,8 @@ class Reader:
 
     def start(self, stdscr):
         self.viewpoint = Viewpoint(stdscr)
-        if len(self.book.words) > 0:
-            self.current_screen = ReadingScreen(self)
-        else:
-            self.current_screen = PauseScreen(self)
-            self.viewpoint.draw(self.current_screen) #Needed due to some oddities with PauseScreen's implementation.
+        self.current_screen = PauseScreen(self)
+        self.viewpoint.draw(self.current_screen) #Needed due to some oddities with PauseScreen's implementation.
 
     def iterate(self):
         c = self.viewpoint.getch()
