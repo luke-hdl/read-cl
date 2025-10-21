@@ -7,4 +7,5 @@ dist/
 *.spec
 
 #Sometimes I develop on Pycharm. Not always, so I want to ignore it.
-.idea/
+.idea/__pycache__/
+*.pyc

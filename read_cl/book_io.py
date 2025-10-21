@@ -14,8 +14,8 @@ def load_words(filepath):
         file_to_read.close()
 
     save_file_name = ".saves/" + hashlib.md5(contents.encode()).hexdigest() + "_save.txt"
-    contents = re.sub("[\s\n]", " ", contents)
-    contents = re.sub("[ ]{1,100}", " ", contents)
+    contents = re.sub(r"[\s\n]", " ", contents)
+    contents = re.sub(r"[ ]{1,100}", " ", contents)
     raw_words = contents.split(" ")
 
     for word in raw_words:
